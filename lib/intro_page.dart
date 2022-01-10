@@ -43,15 +43,29 @@ class _IntroPageState extends State<IntroPage> {
       ],),
   );
 
-  Widget _middle() => Container(
+  Widget _middle() => SizedBox(
     width: double.infinity,
-    color: Colors.green,
-    child: Wrap(
-      direction: Axis.vertical,
+    
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(widget.title),
-        
-      ],),
+        Flexible(
+          flex: 2,
+          fit: FlexFit.tight,
+          child: Image.asset('assets/globe.png', height: 210.0, width: 210.0)),
+        Flexible(
+          flex: 1,
+          fit: FlexFit.loose,
+          child: Text('cryto currency made easy ✌🏾', style: Theme.of(context).textTheme.headline5, textAlign: TextAlign.center)),
+        Flexible(
+          flex: 1,
+          fit: FlexFit.loose,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 8.0),
+            child: Text('with the help of the world\'s most trusted and reliable cryptocurrency exchange', style: Theme.of(context).textTheme.bodyText2, textAlign: TextAlign.center),
+          )),
+      ],
+    )
   );
 
   Widget _bottom() => Container(
