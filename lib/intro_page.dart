@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class IntroPage extends StatefulWidget {
   const IntroPage({Key? key, required this.title}) : super(key: key);
@@ -44,7 +45,7 @@ class _IntroPageState extends State<IntroPage> with SingleTickerProviderStateMix
         children: [
           Flexible(flex: 1, fit: FlexFit.tight, child: _top()),
           Flexible(flex: 6, fit: FlexFit.tight, child: _middle()),
-          Flexible(flex: 3, fit: FlexFit.tight, child: _bottom())
+          Flexible(flex: 2, fit: FlexFit.tight, child: _bottom())
         ],
       ),
     ));
@@ -53,18 +54,23 @@ class _IntroPageState extends State<IntroPage> with SingleTickerProviderStateMix
   Widget _top() => Container(
         width: double.infinity,
         alignment: Alignment.center,
-        color: Colors.amber,
+        
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
           children: [
+            
             Text(widget.title,
-                style: TextStyle(
-                    decoration:
-                        TextDecoration.combine([TextDecoration.underline]))),
+                style: Theme.of(context).textTheme.headline6),
             Container(
-              height: 10.0,
-              color: Colors.accents[0],
-            )
+              height: 5.0,
+              width: 80,
+              margin: const EdgeInsets.all(3.0),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5.0),
+                  color: Colors.green),
+              
+            ),
           ],
         ),
       );
@@ -73,45 +79,40 @@ class _IntroPageState extends State<IntroPage> with SingleTickerProviderStateMix
         children: [
           Flexible(
             flex: 9,
-            child: PageView(
-              scrollDirection: Axis.horizontal,
-              controller: _pageController,
-              onPageChanged: (index) {
-                
-                setState(() {
-                  currentPageIndex = index;
-                  _controller.forward(from: 0.0);
-                });
-              },
-              children: [
-                PageStorage(bucket: _bucket, child: _firstSlide()),
-                PageStorage(bucket: _bucket, child: _secondSlide()),
-                PageStorage(bucket: _bucket, child: _thirdSlide()),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: PageView(
+                scrollDirection: Axis.horizontal,
+                controller: _pageController,
+                onPageChanged: (index) {
+                  
+                  setState(() {
+                    currentPageIndex = index;
+                    _controller.forward(from: 0.0);
+                  });
+                },
+                children: [
+                  PageStorage(bucket: _bucket, child: _firstSlide()),
+                  PageStorage(bucket: _bucket, child: _secondSlide()),
+                  PageStorage(bucket: _bucket, child: _thirdSlide()),
+                ],
+              ),
             ),
           ),
           Flexible(
               flex: 1,
               child: Center(
-                child: ListView.builder(
-                    itemCount: 3,
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, ind) {
-                      return currentPageIndex == ind
-                      ? SlideTransition(position: _offsetAnimation1, child: Icon(
-                            Icons.circle,
-                            size: 10,
-                            color: Colors.lightGreen[300],
-                          ))
-                          : SlideTransition(
-                              position: _offsetAnimation2,
-                              child: Icon(
-                                Icons.circle,
-                                size: 10,
-                                color: Colors.grey,
-                              ));
-                    }),
+                child: SmoothPageIndicator(
+                  controller: _pageController,
+                  count: 3,
+                  effect: const WormEffect(
+                    activeDotColor: Colors.green,
+                    dotColor: Colors.black12,
+                    dotHeight: 10.0,
+                    dotWidth: 10.0,
+                    
+                  ),
+                ),
               ))
         ],
       );
@@ -156,13 +157,15 @@ class _IntroPageState extends State<IntroPage> with SingleTickerProviderStateMix
       );
 
   Widget _bottom() => Container(
+    alignment: Alignment.center,
         width: double.infinity,
-        color: Colors.red,
-        child: Wrap(
-          direction: Axis.vertical,
-          children: [
-            Text(widget.title),
-          ],
-        ),
-      );
+        
+        child: CupertinoButton(
+          color: Colors.green,
+          child: Text('Get Started'),
+          onPressed: () {
+            Navigator.of(context).pushReplacementNamed('/home');
+          },
+        ));
+     
 }
