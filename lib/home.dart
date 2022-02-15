@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:crypto_app/constants.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -180,7 +181,7 @@ class _HomePageState extends State<HomePage> {
                 },
                 child: PageView.builder(
                     controller: _pageController,
-                    itemCount: 4,
+                    itemCount: holdingCardsCONST.length,
                     onPageChanged: (value) {
                       setState(() {
                         _currentPage = value;
@@ -192,7 +193,7 @@ class _HomePageState extends State<HomePage> {
                           (FULL_SCALE - (index - page).abs()) +
                               viewPortFraction);
                       //  print('view scale in flutter $scale');
-                      return _card(scale);
+                      return _card(scale, holdingCardsCONST[index]);
                     }),
               )),
           Flexible(
@@ -231,45 +232,43 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.black87,
                           )),
                 ),
-
-                        Flexible(
+                Flexible(
                   flex: 1,
                   fit: FlexFit.tight,
-                          child: Wrap(
-                            spacing: 5,
-                            alignment: WrapAlignment.center,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            direction: Axis.horizontal,
-                            children: [
-                              const Text('sort by: '),
-                              DropdownButton(
-                                value: menuSelected,
-                                items: <String> [ 'value', 'name', 'trending' ].map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                                onChanged: (newValue){
-                                  setState(() {
-                                    menuSelected = newValue.toString();
-                                  
-                                  });
-                                })
-                            ],
-                          ),
-                        )
+                  child: Wrap(
+                    spacing: 5,
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    direction: Axis.horizontal,
+                    children: [
+                      const Text('sort by: '),
+                      DropdownButton(
+                          value: menuSelected,
+                          items: <String>['value', 'name', 'trending']
+                              .map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              menuSelected = newValue.toString();
+                            });
+                          })
+                    ],
+                  ),
+                )
               ],
-            )
-          
-          
+            ),
+            _assetsList(),
           ],
         ),
       );
 
-  Widget _card(double scale) => Card(
+  Widget _card(double scale, Map<String, dynamic> data) => Card(
         elevation: 0,
-        color: Colors.green[700],
+        color: Color(int.parse(data['color'])),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
@@ -279,16 +278,10 @@ class _HomePageState extends State<HomePage> {
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              Flexible(flex: 1, child: _firstCardContent()),
               Flexible(
-                flex: 1,
-                child: _firstCardContent()),
-              Flexible(
-                flex: 3,
-                fit: FlexFit.tight,
-                child: _secondCardContent()),
-              Flexible(
-                flex: 1,
-                child: _thirdCardContent()),
+                  flex: 3, fit: FlexFit.tight, child: _secondCardContent(data['amount'], data['change'], data['percentage'])),
+              Flexible(flex: 1, child: _thirdCardContent()),
             ],
           ),
         ),
@@ -586,13 +579,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
             child: InkWell(
-              onTap: () {
-                
-              },
+              onTap: () {},
               child: Wrap(
                 alignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.center,
@@ -628,14 +618,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _secondCardContent() {
+  Widget _secondCardContent(String amount, String change, String percent) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Container(
           alignment: Alignment.center,
-          width: _size!.width * 0.36,
+          width: _size!.width * 0.38,
           height: _size!.height * 0.08,
           child: Column(
             mainAxisSize: MainAxisSize.max,
@@ -649,7 +639,7 @@ class _HomePageState extends State<HomePage> {
                         .bodyText1!
                         .copyWith(color: Colors.white)),
                 TextSpan(
-                    text: '1,036,000.00',
+                    text: amount,
                     style: Theme.of(context)
                         .textTheme
                         .headline6!
@@ -666,7 +656,7 @@ class _HomePageState extends State<HomePage> {
                         size: 13,
                       ),
                       Text(
-                        'TZ\$149,652.30 ~ 48%',
+                        'TZ\$$change ~ $percent',
                         style: Theme.of(context).textTheme.caption!.copyWith(
                               fontWeight: FontWeight.w300,
                               color: Colors.white,
@@ -722,5 +712,128 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _assetsList() {
+    return Expanded(
+      child: ListView.builder(
+        itemBuilder: (context, index) {
+          return _assetListItem(
+              assetsCONST[index]['name'],
+              assetsCONST[index]['symbol'],
+              assetsCONST[index]['balance'],
+              assetsCONST[index]['priceChange'],
+              assetsCONST[index]['direction'],
+              assetsCONST[index]['icon'],
+              assetsCONST[index]['coin']);
+        },
+        itemCount: assetsCONST.length,
+      ),
+    );
+  }
 
+  Widget _assetListItem(String name, String symbol, String balance,
+      String change, String direction, String url, String coin) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Flexible(
+              flex: 3,
+              fit: FlexFit.tight,
+              child: Wrap(
+                direction: Axis.horizontal,
+                alignment: WrapAlignment.start,
+                children: [
+                  Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(13),
+                        color: Colors.grey[200],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Image.network(
+                          url,
+                          fit: BoxFit.cover,
+                          colorBlendMode: BlendMode.colorDodge,
+                          filterQuality: FilterQuality.high,
+                          width: 30,
+                          height: 30,
+                        ),
+                      )),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Wrap(
+                      direction: Axis.vertical,
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.start,
+                      spacing: 3,
+                      runSpacing: 3,
+                      children: [
+                        Text(name,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1!
+                                .copyWith(
+                                    color: Colors.black54,
+                                    fontWeight: FontWeight.bold)),
+                        Text(coin + ' ' + symbol,
+                            style: Theme.of(context)
+                                .textTheme
+                                .caption!
+                                .copyWith(color: Colors.grey[500])),
+                      ],
+                    ),
+                  )
+                ],
+              )),
+          Flexible(
+            flex: 2,
+            fit: FlexFit.tight,
+            child: Wrap(
+              direction: Axis.vertical,
+              alignment: WrapAlignment.start,
+              children: [
+                Text(balance,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText1!
+                        .copyWith(color: Colors.black54)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    direction == 'up'
+                        ? const Icon(
+                            Icons.arrow_upward,
+                            color: Colors.green,
+                            size: 10,
+                          )
+                        : const Icon(Icons.arrow_downward,
+                            color: Colors.red, size: 10),
+                    direction == 'up'
+                        ? Text(
+                            change,
+                            style: Theme.of(context)
+                                .textTheme
+                                .caption!
+                                .copyWith(color: Colors.green),
+                          )
+                        : Text(
+                            change,
+                            style: Theme.of(context)
+                                .textTheme
+                                .caption!
+                                .copyWith(color: Colors.red),
+                          )
+                  ],
+                )
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
 }
