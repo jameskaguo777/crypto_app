@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class IntroPage extends StatefulWidget {
@@ -37,18 +38,21 @@ class _IntroPageState extends State<IntroPage> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Flexible(flex: 1, fit: FlexFit.tight, child: _top()),
-          Flexible(flex: 6, fit: FlexFit.tight, child: _middle()),
-          Flexible(flex: 2, fit: FlexFit.tight, child: _bottom())
-        ],
-      ),
-    ));
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: Scaffold(
+          body: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(flex: 1, fit: FlexFit.tight, child: _top()),
+            Flexible(flex: 6, fit: FlexFit.tight, child: _middle()),
+            Flexible(flex: 2, fit: FlexFit.tight, child: _bottom())
+          ],
+        ),
+      )),
+    );
   }
 
   Widget _top() => Container(

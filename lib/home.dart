@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:crypto_app/constants.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 const SCALE_FRACTION = 0.7;
@@ -41,16 +42,21 @@ class _HomePageState extends State<HomePage> {
     _size = MediaQuery.of(context).size;
     cardWidth = _size!.width * 0.9;
     cardHeight = _size!.height * 0.26;
-    return Scaffold(
-      body: SafeArea(
-          child: Column(
-        children: [
-          Flexible(flex: 1, child: _topButtons()),
-          Flexible(flex: 2, child: _balance()),
-          Flexible(flex: 5, child: _cards()),
-          Flexible(flex: 6, child: _assets()),
-        ],
-      )),
+    
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        
+        body: SafeArea(
+            child: Column(
+          children: [
+            Flexible(flex: 1, child: _topButtons()),
+            Flexible(flex: 2, child: _balance()),
+            Flexible(flex: 5, child: _cards()),
+            Flexible(flex: 6, child: _assets()),
+          ],
+        )),
+      ),
     );
   }
 
@@ -280,7 +286,10 @@ class _HomePageState extends State<HomePage> {
             children: [
               Flexible(flex: 1, child: _firstCardContent()),
               Flexible(
-                  flex: 3, fit: FlexFit.tight, child: _secondCardContent(data['amount'], data['change'], data['percentage'])),
+                  flex: 3,
+                  fit: FlexFit.tight,
+                  child: _secondCardContent(
+                      data['amount'], data['change'], data['percentage'])),
               Flexible(flex: 1, child: _thirdCardContent()),
             ],
           ),
